@@ -32,7 +32,10 @@ function parseStationFile(content: string, fileName: string, fileSize: number): 
   const lines = content.split(/\r?\n/);
   for (const line of lines) {
     const trimmed = line.trim();
-    const parts = trimmed.split(/[\t,|]/);
+    if (!trimmed) continue;
+    // Try structured delimiters first; fall back to any whitespace (space-separated .old files)
+    let parts = trimmed.split(/[\t,|]/);
+    if (parts.length < 2) parts = trimmed.split(/\s+/);
     const firstPart = parts[0].trim();
     if (/^\d{10,20}$/.test(firstPart)) {
       entries.push({
