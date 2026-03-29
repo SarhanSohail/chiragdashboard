@@ -6,7 +6,7 @@ export default function AdminPanel() {
   const [users, setUsers] = useState<AppUser[]>(() => loadUsers());
   const [showPasswords, setShowPasswords] = useState<Record<number, boolean>>({});
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [editForm, setEditForm] = useState({ displayName: "", password: "" });
+  const [editForm, setEditForm] = useState({ username: "", displayName: "", password: "" });
 
   const updateUsers = (updated: AppUser[]) => {
     setUsers(updated);
@@ -21,13 +21,13 @@ export default function AdminPanel() {
 
   const startEdit = (user: AppUser) => {
     setEditingId(user.id);
-    setEditForm({ displayName: user.displayName, password: user.password });
+    setEditForm({ username: user.username, displayName: user.displayName, password: user.password });
   };
 
   const saveEdit = (id: number) => {
     const updated = users.map((u) =>
       u.id === id
-        ? { ...u, displayName: editForm.displayName, password: editForm.password }
+        ? { ...u, username: editForm.username, displayName: editForm.displayName, password: editForm.password }
         : u
     );
     updateUsers(updated);
@@ -97,8 +97,8 @@ interface UserRowProps {
   showPassword: boolean;
   onTogglePassword: () => void;
   isEditing: boolean;
-  editForm: { displayName: string; password: string };
-  onEditFormChange: (f: { displayName: string; password: string }) => void;
+  editForm: { username: string; displayName: string; password: string };
+  onEditFormChange: (f: { username: string; displayName: string; password: string }) => void;
   onStartEdit: () => void;
   onSaveEdit: () => void;
   onCancelEdit: () => void;
@@ -122,6 +122,14 @@ function UserRow({
   if (isEditing) {
     return (
       <div className="flex flex-wrap gap-3 items-center py-1">
+        <div className="flex flex-col gap-1 flex-1 min-w-36">
+          <label className="text-xs text-gray-500">Username</label>
+          <input
+            value={editForm.username}
+            onChange={(e) => onEditFormChange({ ...editForm, username: e.target.value })}
+            className="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400"
+          />
+        </div>
         <div className="flex flex-col gap-1 flex-1 min-w-36">
           <label className="text-xs text-gray-500">Display Name</label>
           <input
