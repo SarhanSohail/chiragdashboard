@@ -1,18 +1,22 @@
 import { useState } from "react";
 import { Users, Shield, Eye, EyeOff, CheckCircle, XCircle } from "lucide-react";
-import { USERS, type AppUser } from "@/lib/users";
+import { loadUsers, saveUsers, type AppUser } from "@/lib/users";
 
 export default function AdminPanel() {
-  const [users, setUsers] = useState<AppUser[]>(USERS);
+  const [users, setUsers] = useState<AppUser[]>(() => loadUsers());
   const [showPasswords, setShowPasswords] = useState<Record<number, boolean>>({});
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editForm, setEditForm] = useState({ displayName: "", password: "" });
 
+  const updateUsers = (updated: AppUser[]) => {
+    setUsers(updated);
+    saveUsers(updated);
+  };
+
   const toggleActive = (id: number) => {
     if (id === 0) return;
-    setUsers((prev) =>
-      prev.map((u) => (u.id === id ? { ...u, active: !u.active } : u))
-    );
+    const updated = users.map((u) => (u.id === id ? { ...u, active: !u.active } : u));
+    updateUsers(updated);
   };
 
   const startEdit = (user: AppUser) => {
@@ -21,13 +25,12 @@ export default function AdminPanel() {
   };
 
   const saveEdit = (id: number) => {
-    setUsers((prev) =>
-      prev.map((u) =>
-        u.id === id
-          ? { ...u, displayName: editForm.displayName, password: editForm.password }
-          : u
-      )
+    const updated = users.map((u) =>
+      u.id === id
+        ? { ...u, displayName: editForm.displayName, password: editForm.password }
+        : u
     );
+    updateUsers(updated);
     setEditingId(null);
   };
 

@@ -9,7 +9,9 @@ export interface AppUser {
   active: boolean;
 }
 
-export const USERS: AppUser[] = [
+const STORAGE_KEY = "chirag_dashboard_users";
+
+export const DEFAULT_USERS: AppUser[] = [
   { id: 0, username: "admin", password: "Admin@123", displayName: "Admin", role: "admin", active: true },
   { id: 1, username: "user1", password: "User1@123", displayName: "User 1", role: "user", active: true },
   { id: 2, username: "user2", password: "User2@123", displayName: "User 2", role: "user", active: true },
@@ -18,8 +20,29 @@ export const USERS: AppUser[] = [
   { id: 5, username: "user5", password: "User5@123", displayName: "User 5", role: "user", active: true },
 ];
 
+export function loadUsers(): AppUser[] {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored) as AppUser[];
+    }
+  } catch {
+    // ignore parse errors
+  }
+  return DEFAULT_USERS.map((u) => ({ ...u }));
+}
+
+export function saveUsers(users: AppUser[]): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+  } catch {
+    // ignore storage errors
+  }
+}
+
 export function authenticate(username: string, password: string): AppUser | null {
-  const user = USERS.find(
+  const users = loadUsers();
+  const user = users.find(
     (u) => u.username === username && u.password === password && u.active
   );
   return user ?? null;
