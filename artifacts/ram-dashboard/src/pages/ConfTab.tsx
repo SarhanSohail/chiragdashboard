@@ -97,6 +97,15 @@ export default function ConfTab() {
   const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const handleReset = () => {
+    setFile(null);
+    setConfData(null);
+    setEditData(null);
+    setEditConfigEntries(null);
+    setIsEditing(false);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
   const startEdit = () => {
     if (!confData) return;
     setEditData({ ...confData });
@@ -195,7 +204,14 @@ export default function ConfTab() {
           )}
           <input ref={fileRef} type="file" accept=".dat" className="hidden" onChange={(e) => setFile(e.target.files?.[0] || null)} />
         </div>
-        <button onClick={handleDecrypt} className="mt-4 w-full bg-black text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800">Decrypt</button>
+        <div className="mt-4 flex gap-2">
+          <button onClick={handleDecrypt} className="flex-1 bg-black text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800">Decrypt</button>
+          {confData && (
+            <button onClick={handleReset} className="flex items-center gap-1.5 border border-gray-200 rounded-lg px-4 py-2.5 text-sm hover:bg-gray-50">
+              <Plus size={15} /> Create New
+            </button>
+          )}
+        </div>
       </div>
 
       {confData && d && (

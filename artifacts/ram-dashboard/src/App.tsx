@@ -6,21 +6,47 @@ import ConfTab from "@/pages/ConfTab";
 import DiscloseTab from "@/pages/DiscloseTab";
 import StationDataTab from "@/pages/StationDataTab";
 import AdminPanel from "@/pages/AdminPanel";
-import { type AppUser } from "@/lib/users";
+import { loadUsers, type AppUser } from "@/lib/users";
+
+const SESSION_KEY = "chirag_dashboard_session";
+
+function loadSession(): AppUser | null {
+  try {
+    const stored = localStorage.getItem(SESSION_KEY);
+    if (!stored) return null;
+    const saved = JSON.parse(stored) as AppUser;
+    const fresh = loadUsers().find((u) => u.id === saved.id && u.active);
+    return fresh ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function saveSession(user: AppUser | null) {
+  try {
+    if (user) localStorage.setItem(SESSION_KEY, JSON.stringify(user));
+    else localStorage.removeItem(SESSION_KEY);
+  } catch { /* ignore */ }
+}
 
 type Tab = "session" | "conf" | "disclose" | "stationData" | "admin";
 
 export default function App() {
-  const [currentUser, setCurrentUser] = useState<AppUser | null>(null);
-  const [activeTab, setActiveTab] = useState<Tab>("session");
+  const [currentUser, setCurrentUser] = useState<AppUser | null>(() => loadSession());
+  const [activeTab, setActiveTab] = useState<Tab>(() => {
+    const user = loadSession();
+    return user?.role === "admin" ? "admin" : "session";
+  });
 
   const handleLogin = (user: AppUser) => {
     setCurrentUser(user);
+    saveSession(user);
     setActiveTab(user.role === "admin" ? "admin" : "session");
   };
 
   const handleLogout = () => {
     setCurrentUser(null);
+    saveSession(null);
     setActiveTab("session");
   };
 

@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Upload, KeyRound, Code2, PencilLine, Save, X, Download } from "lucide-react";
+import { Upload, KeyRound, Code2, PencilLine, Save, X, Download, Plus } from "lucide-react";
 
 interface SessionData {
   sessionId: string;
@@ -102,6 +102,14 @@ export default function SessionTab() {
   const [isEditing, setIsEditing] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleReset = () => {
+    setFile(null);
+    setSessionData(null);
+    setEditData(null);
+    setIsEditing(false);
+    if (fileRef.current) fileRef.current.value = "";
+  };
 
   const startEdit = () => {
     if (!sessionData) return;
@@ -217,9 +225,16 @@ export default function SessionTab() {
           )}
           <input ref={fileRef} type="file" accept=".dat" className="hidden" onChange={(e) => setFile(e.target.files?.[0] || null)} />
         </div>
-        <button onClick={handleGetSession} className="mt-4 w-full bg-black text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800 flex items-center justify-center gap-2">
-          <KeyRound size={16} /> Get Session
-        </button>
+        <div className="mt-4 flex gap-2">
+          <button onClick={handleGetSession} className="flex-1 bg-black text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800 flex items-center justify-center gap-2">
+            <KeyRound size={16} /> Get Session
+          </button>
+          {sessionData && (
+            <button onClick={handleReset} className="flex items-center gap-1.5 border border-gray-200 rounded-lg px-4 py-2.5 text-sm hover:bg-gray-50">
+              <Plus size={15} /> Create New
+            </button>
+          )}
+        </div>
       </div>
 
       {sessionData && (

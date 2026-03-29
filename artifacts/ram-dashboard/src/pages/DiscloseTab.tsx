@@ -40,6 +40,14 @@ export default function DiscloseTab() {
   const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const handleReset = () => {
+    setFile(null);
+    setDiscloseData(null);
+    setEditEntries(null);
+    setIsEditing(false);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(false);
@@ -114,7 +122,14 @@ export default function DiscloseTab() {
           <span className="text-gray-800">{file ? file.name : ""}</span>
           <input ref={fileRef} type="file" accept=".dat" className="hidden" onChange={(e) => setFile(e.target.files?.[0] || null)} />
         </div>
-        <button onClick={handleDecrypt} className="mt-4 w-full bg-black text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800">Decrypt Disclosed File</button>
+        <div className="mt-4 flex gap-2">
+          <button onClick={handleDecrypt} className="flex-1 bg-black text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800">Decrypt Disclosed File</button>
+          {discloseData && (
+            <button onClick={handleReset} className="flex items-center gap-1.5 border border-gray-200 rounded-lg px-4 py-2.5 text-sm hover:bg-gray-50">
+              <Plus size={15} /> Create New
+            </button>
+          )}
+        </div>
       </div>
 
       {discloseData && (

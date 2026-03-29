@@ -32,7 +32,6 @@ function parseStationFile(content: string, fileName: string, fileSize: number): 
   const lines = content.split(/\r?\n/);
   for (const line of lines) {
     const trimmed = line.trim();
-    // Only process lines where the first token is purely numeric (10+ digits = likely EID)
     const parts = trimmed.split(/[\t,|]/);
     const firstPart = parts[0].trim();
     if (/^\d{10,20}$/.test(firstPart)) {
@@ -81,6 +80,14 @@ export default function StationDataTab() {
   const [isEditing, setIsEditing] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleReset = () => {
+    setFile(null);
+    setStationData(null);
+    setEditEntries(null);
+    setIsEditing(false);
+    if (fileRef.current) fileRef.current.value = "";
+  };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -160,7 +167,14 @@ export default function StationDataTab() {
           )}
           <input ref={fileRef} type="file" className="hidden" onChange={(e) => setFile(e.target.files?.[0] || null)} />
         </div>
-        <button onClick={handleDecrypt} className="mt-4 w-full bg-black text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800">Decrypt</button>
+        <div className="mt-4 flex gap-2">
+          <button onClick={handleDecrypt} className="flex-1 bg-black text-white py-2.5 rounded-lg text-sm font-medium hover:bg-gray-800">Decrypt</button>
+          {stationData && (
+            <button onClick={handleReset} className="flex items-center gap-1.5 border border-gray-200 rounded-lg px-4 py-2.5 text-sm hover:bg-gray-50">
+              <Plus size={15} /> Create New
+            </button>
+          )}
+        </div>
       </div>
 
       {stationData && (
